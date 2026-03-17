@@ -1,22 +1,18 @@
+import { jwtVerify } from "jose"
+
 type JwtPayload = {
   exp?: number
 }
 
-function decodeBase64Url(input: string): string {
-  const normalized = input.replace(/-/g, "+").replace(/_/g, "/")
-  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=")
-  return atob(padded)
-}
+const secret = new TextEncoder().encode(process.env.SESSION_JWT_SECRET ?? "")
 
-export function isSessionJwtValid(token?: string): boolean {
-  if (!token) return false
-
-  const parts = token.split(".")
-  if (parts.length !== 3) return false
+export async function isSessionJwtValid(token?: string): Promise<boolean> {
+  if (!token || !process.env.SESSION_JWT_SECRET) return false
 
   try {
-    const payloadJson = decodeBase64Url(parts[1])
-    const payload = JSON.parse(payloadJson) as JwtPayload
+    const { payload } = await jwtVerify<JwtPayload>(token, secret, {
+      algorithms: ["HS256"],
+    })
 
     if (payload.exp === undefined) return true
     if (typeof payload.exp !== "number") return false

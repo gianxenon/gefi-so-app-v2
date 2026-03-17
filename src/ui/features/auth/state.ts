@@ -4,6 +4,7 @@ import type { LoginEvent } from "@/application/events/auth/login"
 export type LoginState = {
   userid: string
   password: string
+  company: string
   loading: boolean
   checkingSession: boolean
   error: string | null
@@ -12,6 +13,7 @@ export type LoginState = {
 export const initialLoginState: LoginState = {
   userid: "",
   password: "",
+  company: "",
   loading: false,
   checkingSession: true,
   error: null,
@@ -29,6 +31,11 @@ export function loginReducer(state: LoginState, event: LoginEvent): LoginState {
         ...state,
         password: event.value,
       }
+    case "COMPANY_CHANGED":
+      return {
+        ...state,
+        company: event.value,
+      }  
     case "SESSION_CHECK_STARTED":
       return {
         ...state,
@@ -55,6 +62,7 @@ export function loginReducer(state: LoginState, event: LoginEvent): LoginState {
         ...state,
         loading: false,
       }
+    
     default:
       return state
   }

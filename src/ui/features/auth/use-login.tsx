@@ -45,6 +45,9 @@ export function useLogin() {
 
   const onPasswordChange = React.useCallback((value: string) => {
     dispatch({ type: "PASSWORD_CHANGED", value })
+  }, []) 
+  const onCompanyChange = React.useCallback((value: string) => {
+    dispatch({ type: "COMPANY_CHANGED", value })
   }, [])
 
   const onSubmit = React.useCallback(
@@ -56,6 +59,7 @@ export function useLogin() {
         const result = await submitLogin({
           userid: state.userid,
           password: state.password,
+          company: state.company,
         })
 
         if (!result.ok) {
@@ -69,7 +73,7 @@ export function useLogin() {
         dispatch({ type: "LOGIN_FINISHED" })
       }
     },
-    [navigateToDashboard, state.password, state.userid]
+    [navigateToDashboard, state.password, state.userid, state.company]
   )
 
 
@@ -77,6 +81,7 @@ export function useLogin() {
     state,
     onUserIdChange,
     onPasswordChange,
+    onCompanyChange,
     onSubmit,
   }
 }

@@ -1,14 +1,14 @@
 "use client"
 import { cn } from "@/shared/utils"
-import { Button } from "@/app/components/ui/button"
-import { Card, CardContent } from "@/app/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel, 
-} from "@/app/components/ui/field"
-import { Input } from "@/app/components/ui/input"
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
 import Image from "next/image"
 import {
   Select,
@@ -16,19 +16,18 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/app/components/ui/select"
+} from "@/components/ui/select"
 import { useLogin } from "./use-login"
 
 
 export function LoginForm({
   className, ...props
 }: React.ComponentProps<"div">) {
-    const branches = [
-      { code: "BR001", name: "Main Branch" },
-      { code: "BR002", name: "Cebu Branch" },
-      { code: "BR003", name: "Davao Branch" },
+    const company = [
+      { code: "GEFI", name: "Global Essencial food, Inc" },
+      { code: "HFI", name: "Holly Farm Inc." }, 
     ];
-    const { state, onUserIdChange, onPasswordChange, onSubmit } = useLogin();
+    const { state, onUserIdChange, onPasswordChange, onCompanyChange, onSubmit } = useLogin();
 
   
  
@@ -45,11 +44,13 @@ export function LoginForm({
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="userId">User ID</FieldLabel>
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
+                  id="userId"
+                  type="text"
+                  placeholder="Enter your user ID"
+                  value={state.userid}
+                  onChange={(e) => onUserIdChange(e.target.value)}
                   required
                 />
               </Field>
@@ -63,18 +64,30 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Password"
+                  value={state.password}
+                  onChange={(e) => onPasswordChange(e.target.value)}
+                  required
+                />
               </Field>
                <Field>
-                <FieldLabel>Branch</FieldLabel>
-                <Select name="branch" required>
-                  <SelectTrigger id="branch" className="w-full">
-                    <SelectValue placeholder="Select a branch" />
+                <FieldLabel>Company</FieldLabel>
+                <Select
+                  name="company"
+                  value={state.company}
+                  onValueChange={onCompanyChange}
+                  required
+                >
+                  <SelectTrigger id="company" className="w-full">
+                    <SelectValue placeholder="Select a company" />
                   </SelectTrigger>
                   <SelectContent>
-                    {branches.map((branch) => (
-                      <SelectItem key={branch.code} value={branch.code}>
-                        {branch.code} — {branch.name}
+                    {company.map((company) => (
+                      <SelectItem key={company.code} value={company.code}>
+                        {company.code} — {company.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

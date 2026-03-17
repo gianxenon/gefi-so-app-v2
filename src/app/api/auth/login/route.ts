@@ -2,34 +2,41 @@ import { NextResponse } from "next/server"
 
 type LoginBody = {
   userid: string
-  password: string
+  password: string,
+  company: string
 }
 
 type PhpAuthSuccess = { success: true; jwt: string }
-type PhpAuthFail = { success: false; message?: string }
+type PhpAuthFail = { success?: false; message?: string; resultmessage?: string }
 
 export async function POST(req: Request) {
   try {
     let userid = ""
     let password = ""
+    let company = ""
     try {
       const body = (await req.json()) as LoginBody
       userid = body.userid
       password = body.password
+      company = body.company
     } catch {
       return NextResponse.json({ message: "Invalid login payload." }, { status: 400 })
     }
 
     //check base url in env
-    const base = process.env.PHP_API_BASE
+    if (company !== "GEFI" && company !== "HFI") {
+      return NextResponse.json({ message: "Invalid company." }, { status: 400 })
+    }
+ 
+    const base = company === "GEFI" ? process.env.API_GEFI : process.env.API_HFI
     if (!base) {
       return NextResponse.json(
-        { message: "Missing PHP_API_BASE in .env.local" },
+        { message: "Missing API_BASE in .env.local" },
         { status: 500 }
       )
     }
     // call base + /udp.php?objectcode=auth with POST method and body { userid, password }
-    const phpUrl = `${base}/udp.php?objectcode=auth`
+    const phpUrl = `${base}/udp.php?objectcode=Auth-dante`
  
     let phpRes: Response
     try {
@@ -39,7 +46,7 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: JSON.stringify({ userid, password }),
+        body: JSON.stringify({ userid, password, company}),
         cache: "no-store",
       })
     } catch {
@@ -59,11 +66,14 @@ export async function POST(req: Request) {
     }
 
     if (!phpRes.ok || !data || data.success !== true) {
+      const fail = data as PhpAuthFail | null
+      const message = fail?.message ?? fail?.resultmessage ?? "Unauthorized"
       return NextResponse.json(
-        { message: (data as PhpAuthFail)?.message ?? "Unauthorized", php: data, raw },
+        { message, php: data, raw },
         { status: 401 }
       )
     } 
+
     const jwt = (data as PhpAuthSuccess).jwt
     if (!jwt) {
       return NextResponse.json(
@@ -71,6 +81,7 @@ export async function POST(req: Request) {
         { status: 500 }
       )
     } 
+    
     const res = NextResponse.json({ ok: true })
     res.cookies.set("session", jwt, {
       httpOnly: true,

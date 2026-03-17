@@ -30,12 +30,12 @@ export async function checkSession(): Promise<boolean> {
   }
 }
 
-export async function loginWithCredentials(userid: string, password: string): Promise<LoginResult> {
+export async function loginWithCredentials(userid: string, password: string, company: string): Promise<LoginResult> {
   try {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userid, password }),
+      body: JSON.stringify({ userid, password, company }),
     })
 
     const text = await res.text()

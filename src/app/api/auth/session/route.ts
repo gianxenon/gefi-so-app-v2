@@ -5,7 +5,7 @@ import { isSessionJwtValid } from "@/shared/auth/session"
 export async function GET() {
   const cookieStore = await cookies()
   const jwt = cookieStore.get("session")?.value
-  const valid = isSessionJwtValid(jwt)
+  const valid = await isSessionJwtValid(jwt)
 
   if (!valid && jwt) {
     const res = NextResponse.json({ authenticated: false })

@@ -7,3 +7,4 @@ export type LoginEvent =
   | { type: "LOGIN_STARTED" }
   | { type: "LOGIN_FAILED"; message: string }
   | { type: "LOGIN_FINISHED" }
+  | { type: "COMPANY_CHANGED"; value: string }
